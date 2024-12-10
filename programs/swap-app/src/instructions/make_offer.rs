@@ -10,7 +10,9 @@ use anchor_spl::{
         transfer_checked // Function to execute a safe token transfer.
     }
 };
-use crate::{Offer, ANCHOR_DISCRIMINATION}; // Imports custom definitions for the `Offer` struct and the `ANCHOR_DISCRIMINATION` constant.
+use crate::{Offer, ANCHOR_DISCRIMINATION};
+
+use super::transfer_tokens; // Imports custom definitions for the `Offer` struct and the `ANCHOR_DISCRIMINATION` constant.
 
 /// Defines the context for the `MakeOffer` instruction.
 /// This structure includes all accounts and programs involved in the transaction.
@@ -71,10 +73,19 @@ pub struct MakeOffer<'info> {
     pub associated_token_program: Program<'info, AssociatedToken>, // Program for associated token accounts.
 }
 
-/// This function will send the offered tokens from the maker's account to the vault.
-/// Currently, it only logs a message and returns success.
-pub fn send_offered_tokens_to_vault(ctx: Context<MakeOffer>) -> Result<()> {
-    // Logs a message with the program ID for debugging purposes.
-    msg!("Greetings from: {:?}", ctx.program_id);
-    Ok(())
+/// This function transfers the offered tokens from the maker's account to the vault.
+/// It uses the `transfer_tokens` utility to perform the token transfer operation securely.
+pub fn send_offered_tokens_to_vault(
+    ctx: &Context<MakeOffer>, // The context containing all accounts and data for the `MakeOffer` instruction.
+    token_a_offered_amount: u64, // The amount of token A being offered by the maker.
+) -> Result<()> {
+    // Call the `transfer_tokens` function to execute the token transfer.
+    transfer_tokens(
+        &ctx.accounts.maker_token_account_a, // Source account: Maker's token account holding the offered tokens.
+        &ctx.accounts.vault, // Destination account: The vault account for securely holding the offered tokens.
+        &token_a_offered_amount, // Amount of tokens to transfer from the maker to the vault.
+        &ctx.accounts.token_mint_a, // Mint account for the token being transferred (token A).
+        &ctx.accounts.maker, // The authority signing the transaction (the maker of the offer).
+        &ctx.accounts.token_program // The token program interface handling the transfer operation.
+    )
 }
