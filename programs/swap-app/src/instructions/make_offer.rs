@@ -89,3 +89,16 @@ pub fn send_offered_tokens_to_vault(
         &ctx.accounts.token_program // The token program interface handling the transfer operation.
     )
 }
+
+
+pub fn save_offer(ctx:Context<MakeOffer>, id: u64, token_b_wanted_amount: u64) -> Result<()> {
+    ctx.accounts.offer.set_inner(Offer {
+        id,
+        maker: ctx.accounts.maker.key(),
+        token_mint_a: ctx.accounts.token_mint_a.key(),
+        token_mint_b: ctx.accounts.token_mint_b.key(),
+        token_b_wanted_amount,
+        bump: ctx.bumps.offer
+    });
+    Ok(())
+}
