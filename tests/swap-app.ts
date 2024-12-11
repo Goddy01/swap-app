@@ -58,7 +58,7 @@ describe("swap", async () => {
   const connection = provider.connection;
 
   // Reference to the compiled SwapApp program.
-  const program = anchor.workspace.Swap as Program<SwapApp>;
+  const program = anchor.workspace.SwapApp as Program<SwapApp>;
 
   // Object to store account references used across tests.
   const accounts: Record<string, PublicKey> = {
